@@ -10,7 +10,7 @@ public abstract class AbstractThymeleafHandler implements Handler<RoutingContext
     @Override
     public void handle(RoutingContext ctx) {
         setModel(ctx);
-        engine.render(ctx, "templates/"+template, res -> {
+        engine.render(ctx, template, res -> {
             if (res.succeeded()) {
                 ctx.response().end(res.result());
             } else {

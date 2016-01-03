@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.TYPE})
 @Service
-public @interface ThymeleafHandlerPath {
+public @interface HandlerPath {
     String path();
     String template() default "";
 }
