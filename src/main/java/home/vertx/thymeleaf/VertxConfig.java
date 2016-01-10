@@ -5,6 +5,7 @@ import io.advantageous.qbit.server.EndpointServerBuilder;
 import io.advantageous.qbit.server.ServiceEndpointServer;
 import io.advantageous.qbit.vertx.http.VertxHttpServerBuilder;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.http.HttpServer;
@@ -75,6 +76,10 @@ public class VertxConfig {
                 handler.setEngine(engine);
                 handler.setTemplate(thymeleafSettings.template());
                 router.get(thymeleafSettings.path()).handler(handler);
+            }else if(Handler.class.isAssignableFrom(object.getClass())) {
+                Handler handler = (Handler)object;
+                HandlerPath pathSettings = handler.getClass().getAnnotation(HandlerPath.class);
+                router.get(pathSettings.path()).handler(handler);
             }
         }
     }
@@ -101,7 +106,7 @@ public class VertxConfig {
 
     @Bean
     public StaticHandler staticHandler(){
-        return StaticHandler.create("static");
+        return StaticHandler.create().setWebRoot("dist").setCachingEnabled(false);
     }
 
     @Bean

@@ -5,13 +5,14 @@ import styles from 'material-ui/lib/styles';
 import FontIcon from 'material-ui/lib/font-icon';
 import List from 'material-ui/lib/lists/list';
 import ListItem from 'material-ui/lib/lists/list-item';
-//import shouldPureComponentUpdate from 'react-pure-render/function';
+import RandomMC from 'random-material-color';
+
+const colors = styles.Colors;
 
 class Content extends Component{
 
     constructor(props) {
         super(props);
-//        this.shouldComponentUpdate=shouldPureComponentUpdate
     }
      shouldComponentUpdate(nextProps, nextState, nextContext) {
         return true; // this will throw without context, read on
@@ -36,10 +37,23 @@ class Content extends Component{
         var contacts =<Avatar>test</Avatar>;
         if(this.state!=null){
                 contacts = this.state.data.map(function(contact){
-                    return (<Avatar>{contact.firstName}</Avatar>);
+                    var firstLetter = contact.firstName.substring(0, 1);
+                    var randomColor = RandomMC.getColor({text: firstLetter});
+                    return <ListItem
+                                 disabled={true}
+                                 leftAvatar={
+                                   <Avatar
+                                     backgroundColor={randomColor}
+                                   >
+                                      {firstLetter}
+                                   </Avatar>
+                                 }
+                               >
+                                 {contact.firstName}
+                               </ListItem>;
             });
         }
-        return <div>{contacts}</div>;
+        return <List>{contacts}</List>;
     }
 
 };

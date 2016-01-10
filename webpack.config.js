@@ -1,13 +1,15 @@
+var path = require('path');
+
 module.exports = {
-  context: __dirname + "/client",
+  context: path.join(__dirname, "client"),
   entry: {
-    javascript: "./app.js",
-    html: "./index.html",
+    javascript: path.join(__dirname, "client", "app.js"),
+    html: path.join(__dirname, "client", "index.html"),
   },
 
   output: {
     filename: "app.js",
-    path: __dirname + "/src/main/resources/static",
+    path: __dirname + "/dist/",
   },
  module: {
          loaders: [{

@@ -17,6 +17,9 @@ sourceSets {
         java {
             srcDir 'src/generated/java'
         }
+        resources {
+            srcDir 'dist'
+        }
     }
 }
 apply plugin: 'application'
