@@ -4,30 +4,30 @@ import home.vertx.thymeleaf.contact.ContactEndpoint;
 import io.advantageous.qbit.server.EndpointServerBuilder;
 import io.advantageous.qbit.server.ServiceEndpointServer;
 import io.advantageous.qbit.vertx.http.VertxHttpServerBuilder;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
+import io.vertx.core.*;
 import io.vertx.core.http.HttpServer;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
 
 @Configuration
-public class VertxConfig {
+@Import({JOOQConfiguration.class, DataSourceConfiguration.class})
+@ComponentScan("home.vertx.thymeleaf.contact")
+@PropertySource("classpath:/application.properties")
+public class StarterVerticle extends AbstractVerticle{
+
+    private static final Vertx vertx = Vertx.vertx();
 
     @Autowired
     private HttpServer server;
-
-    @Autowired
-    private Vertx vertx;
 
     @Autowired
     private Router router;
@@ -44,15 +44,19 @@ public class VertxConfig {
     @Autowired
     private StaticHandler staticHandler;
 
-    @Bean
-    public Vertx vertx(){
-        VertxOptions options = new VertxOptions();
-        Vertx vertx = Vertx.vertx(options);
-        return vertx;
+    public static void main(String[] args) throws Exception {
+        vertx.deployVerticle(StarterVerticle.class.getName());
     }
 
+    @Override
+    public void start() throws Exception {
+        SpringApplication.run(StarterVerticle.class);
+        super.start();
+    }
+
+
     @Bean
-    public HttpServer server(Vertx vertx){
+    public HttpServer server(){
         HttpServer server = vertx.createHttpServer();
         return server;
     }
@@ -85,7 +89,7 @@ public class VertxConfig {
     }
 
     @Bean
-    public io.advantageous.qbit.http.server.HttpServer qbitServer(HttpServer server, Vertx vertx, Router router){
+    public io.advantageous.qbit.http.server.HttpServer qbitServer(HttpServer server, Router router){
         io.advantageous.qbit.http.server.HttpServer qbitServer = VertxHttpServerBuilder.vertxHttpServerBuilder()
                 .setHttpServer(server)
                 .setRouter(router)
@@ -117,10 +121,15 @@ public class VertxConfig {
 
     @PostConstruct
     public void gameOn(){
-        vertx.deployVerticle(SimpleVerticle.class.getName() , new DeploymentOptions().setInstances(4));
         server.requestHandler(router::accept);
         serviceEndpointServer.startServer();
         server.listen(80);
     }
-}
 
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer placeholderConfigurer(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+}
